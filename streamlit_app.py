@@ -14,19 +14,20 @@ pd_agent = create_csv_agent(
     agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
 )
 
-placeholder = st.empty()
-with placeholder:
-    result = pd_agent.run(
-        f"""
-        Create me an entire functioning streamlit dashboard to analyze this data.
-        Plot trends over time, use st.metrics to display revelant big numbers.
-        Use bar charts to show breakdowns by different categories.
-        
-        Return the python script I can use to create the entire dashboard.
-        The filepath to the csv you're analyzing is is {csv}
-        """
-    )
-placeholder.empty()
+with st.spinner('Thinking...'):
+    placeholder = st.empty()
+    with placeholder:
+        result = pd_agent.run(
+            f"""
+            Create me an entire functioning streamlit dashboard to analyze this data.
+            Plot trends over time, use st.metrics to display revelant big numbers.
+            Use bar charts to show breakdowns by different categories.
+            
+            Return the python script I can use to create the entire dashboard.
+            The filepath to the csv you're analyzing is is {csv}
+            """
+        )
+    placeholder.empty()
 
 exec(result)
 with st.expander('Code Written by Agent'):
