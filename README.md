@@ -1,5 +1,6 @@
 # streamlit-data-analyst
 Repo where you can upload a csv - ask questions about it - and get the results shown in streamlit
 
-<img width="315" alt="image" src="https://github.com/parker84/streamlit-data-analyst/assets/12496987/4bd7bcba-ee14-4908-a973-6f9b3bd56361">
-<img width="269" alt="image" src="https://github.com/parker84/streamlit-data-analyst/assets/12496987/ab48d40b-f4a0-4d3b-b076-6a9fb6164c50">
+<img width="706" alt="image" src="https://github.com/parker84/streamlit-data-analyst/assets/12496987/2cb85e3e-0241-4c94-87d8-b427126aec03">
+<img width="600" alt="image" src="https://github.com/parker84/streamlit-data-analyst/assets/12496987/608b8e7b-c1bd-4da9-8d6e-84aadf7172e2">
+<img width="600" alt="image" src="https://github.com/parker84/streamlit-data-analyst/assets/12496987/6f7ea800-5bd8-458c-b9f0-f671e1639b93">
