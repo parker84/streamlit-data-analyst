@@ -7,6 +7,8 @@ import streamlit as st
 import pandas as pd
 import os
 
+DEFAULT_CHAT_MODEL = 'gpt-3.5-turbo-16k'
+
 st.set_page_config(page_icon='💻')
 st.title('Streamlit Data Analyst 💻')
 st.markdown('**Purpose**: To enable users to understand their data')
@@ -36,28 +38,27 @@ with st.form('form'):
         height=150,
     )
 
-    st.sidebar.subheader("Enter Your API Key 🗝️")
-    open_api_key = st.sidebar.text_input(
-        "Open API Key 🗝️", 
-        value=st.session_state.get('open_api_key', ''),
+    openai_api_key = st.sidebar.text_input(
+        "Enter Your **OpenAI** API Key 🗝️", 
+        value=st.session_state.get('openai_api_key', ''),
         help="Get your API key from https://openai.com/",
         type='password'
     )
-    os.environ["OPENAI_API_KEY"] = open_api_key
-    st.session_state['open_api_key'] = open_api_key
+    os.environ["OPENAI_API_KEY"] = openai_api_key
+    st.session_state['openai_api_key'] = openai_api_key
     load_dotenv(find_dotenv())
+
+    with st.sidebar.expander('Advanced Settings ⚙️', expanded=False):
+        open_ai_model = st.text_input('OpenAI Chat Model', DEFAULT_CHAT_MODEL, help='See model options here: https://platform.openai.com/docs/models/overview')   
 
     submitted = st.form_submit_button("Analyze!")
 
 if submitted:
-    if open_api_key == '' or open_api_key is None:
-        st.error("⚠️ Please enter your API key in the sidebar")
+    if openai_api_key == '' or openai_api_key is None:
+        st.error("⚠️ Please enter your OpenAI API key in the sidebar")
     else:
         pd_agent = create_csv_agent(
-            # OpenAI(temperature=0),
-            ChatOpenAI(temperature=0, model='gpt-3.5-turbo-16k'),
-            # ChatOpenAI(temperature=0, model='gpt-3.5-turbo'),
-            # ChatOpenAI(temperature=0, model='gpt-4'),
+            ChatOpenAI(temperature=0, model=open_ai_model),
             csv,
             verbose=True,
             agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
