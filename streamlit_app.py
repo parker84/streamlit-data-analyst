@@ -62,6 +62,7 @@ if submitted:
             csv,
             verbose=True,
             agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+            handle_parsing_errors=True,
         )
         @st.cache_data
         def ask_the_csv_agent(prompt):
@@ -72,6 +73,8 @@ if submitted:
         Write me a python script for a streamlit dashboard to analyze this data.
         Only return this python script, nothing else - no commentary / formatting.
         Assume your whole output is going to be inserted right into a python script and run.
+        Run the lines of code yourself to ensure they actually work.
+        Don't call the action "`python_repl_ast`" (this won't work) - instead just use "python_repl_ast".
 
         Answer these specific questions with your dashboard:
         {question}
