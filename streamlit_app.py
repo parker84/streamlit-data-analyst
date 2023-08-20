@@ -11,13 +11,14 @@ st.set_page_config(page_icon='💻')
 st.title('Streamlit Data Analyst 💻')
 st.markdown('**Purpose**: To enable users to understand their data')
 
-csv_file = st.file_uploader("Upload Your CSV", type={"csv"})
 df = None
+csv_file = st.file_uploader("Upload Your CSV", type={"csv"})
 
 if csv_file is not None:
     df = pd.read_csv(csv_file)
+st.caption("Or ... don't upload a csv and use the titanic dataset instead")
 
-if st.button("Or ... Use The Titanic's Data"):
+if df is None:
     df = pd.read_csv('https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv')
 
 if df is not None:
@@ -26,10 +27,21 @@ if df is not None:
     pd_agent = create_csv_agent(
         # OpenAI(temperature=0),
         # ChatOpenAI(temperature=0, model='gpt-3.5-turbo-16k'),
-        ChatOpenAI(temperature=0, model='gpt-4'),
+        ChatOpenAI(temperature=0, model='gpt-3.5-turbo')
+        # ChatOpenAI(temperature=0, model='gpt-4'),
         csv,
         verbose=True,
         agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    )
+    question = st.text_area(
+        label='Ask Specific Questions About the Dataset',
+        value="""1. Show me a sample of this dataset (include all the columns)
+2. What is the survival rate by Gender?
+3. What is the survival rate by age bucket?
+4. What is the survival rate by Class?
+5. What is the survival rate by Embarked location?
+        """,
+        height=150,
     )
 
     @st.cache_data
@@ -37,24 +49,31 @@ if df is not None:
         result = pd_agent.run(prompt)
         return result
 
-    placeholder = st.empty()
+    prompt = f"""
+    Write me a python script for a streamlit dashboard to analyze this data.
+    Only return this python script, nothing else - no commentary / formatting.
+    Assume your whole output is going to be inserted right into a python script and run.
+
+    Answer these specific questions with your dashboard:
+    {question}
+    Display results with nice charts (using streamlit or plotly.express)
+    
+    The filepath to the csv you're analyzing is ./{csv}
+
+    Only return this python script, nothing else - no commentary / formatting.
+    Assume your whole output is going to be inserted right into a python script and run.
+    """
+
+    placeholder = st.empty() # we do this so 
     with placeholder:
-        result = ask_the_csv_agent(
-            f"""
-            Write me a python script for a streamlit dashboard to analyze this data.
-            Only return this python script, nothing else - no commentary / formatting.
-            Assume your whole output is going to be inserted right into a python script and run. 
-
-            I should know everything important about this dataset after looking at the dashboard.
-            1. Pull important metrics out into st.metric (put these at the top of the dashboard) and round accordingly
-            2. Plot any relevant trends over time (use px.line) - and label your axes / title your charts
-            3. Use bar charts to show breakdowns by different categories (use px.bar) - and label your axes / title your charts
-            4. use st.columns to nicely format your dashboard
-            5. This should give me a complete overview of everything important I need to know about this dataset.
-
-            The filepath to the csv you're analyzing is ./{csv}
-            """
-        ).replace('```', '\n').replace('python', '')
+        result = (
+            ask_the_csv_agent(prompt)
+            .replace('The Python script for the Streamlit dashboard is as follows:', '')
+            .replace('```', '\n').replace('python', '')
+        )
+        result_lines = result.split('\n')
+        if 'python' in result_lines[0].lower():
+            result = '\n'.join(result_lines[1:])
     placeholder.empty()
 
     exec(result)
@@ -68,11 +87,3 @@ if df is not None:
     ```
     """
     )
-
-    st.markdown('### Ask a Specific Question')
-    question = st.text_input(
-        label='Ask a Specific Question About the Dataset',
-        value='How many people are over the age of 65?'
-    )
-    result = ask_the_csv_agent(f"{question} (display response for markdown)")
-    st.markdown(result)
