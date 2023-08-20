@@ -27,7 +27,7 @@ if df is not None:
     pd_agent = create_csv_agent(
         # OpenAI(temperature=0),
         # ChatOpenAI(temperature=0, model='gpt-3.5-turbo-16k'),
-        ChatOpenAI(temperature=0, model='gpt-3.5-turbo')
+        ChatOpenAI(temperature=0, model='gpt-3.5-turbo'),
         # ChatOpenAI(temperature=0, model='gpt-4'),
         csv,
         verbose=True,
