@@ -11,30 +11,30 @@ st.set_page_config(page_icon='💻')
 st.title('Streamlit Data Analyst 💻')
 st.markdown('**Purpose**: To enable users to understand their data')
 
-df = None
-csv_file = st.file_uploader("Upload Your CSV", type={"csv"})
+with st.form('form'):
+    df = None
+    csv_file = st.file_uploader("Upload Your CSV", type={"csv"})
+    st.caption("Or ... don't upload a csv and use the **Titanic Dataset**🚢 instead")
 
-if csv_file is not None:
-    df = pd.read_csv(csv_file)
-st.caption("Or ... don't upload a csv and use the titanic dataset instead")
+    if csv_file is not None:
+        df = pd.read_csv(csv_file)
 
-if df is None:
-    df = pd.read_csv('https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv')
+    if df is None:
+        df = pd.read_csv('https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv')
 
-if df is not None:
     df.to_csv('data.csv', index=False)
     csv = 'data.csv'
     pd_agent = create_csv_agent(
         # OpenAI(temperature=0),
-        # ChatOpenAI(temperature=0, model='gpt-3.5-turbo-16k'),
-        ChatOpenAI(temperature=0, model='gpt-3.5-turbo'),
+        ChatOpenAI(temperature=0, model='gpt-3.5-turbo-16k'),
+        # ChatOpenAI(temperature=0, model='gpt-3.5-turbo'),
         # ChatOpenAI(temperature=0, model='gpt-4'),
         csv,
         verbose=True,
         agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
     )
     question = st.text_area(
-        label='Ask Specific Questions About the Dataset',
+        label='Ask Questions',
         value="""1. Show me a sample of this dataset (include all the columns)
 2. What is the survival rate by Gender?
 3. What is the survival rate by age bucket?
@@ -44,6 +44,9 @@ if df is not None:
         height=150,
     )
 
+    submitted = st.form_submit_button("Analyze!")
+
+if submitted:
     @st.cache_data
     def ask_the_csv_agent(prompt):
         result = pd_agent.run(prompt)
